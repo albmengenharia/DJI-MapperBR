@@ -12,9 +12,8 @@ Antes de começar, certifique-se de que você possui:
     ```bash
     npm install -g supabase
     ```
-4.  **Deno:** O runtime para executar o script de geração de API key.
-5.  **Git:** Para clonar o repositório.
-6.  **(Opcional) Uma conta no Stripe:** Necessária se você planeja usar a funcionalidade de monetização.
+4.  **Git:** Para clonar o repositório.
+5.  **(Opcional) Uma conta no Stripe:** Necessária se você planeja usar a funcionalidade de monetização.
 
 ---
 
@@ -107,29 +106,21 @@ Após a implantação, você pode ver suas funções ativas na seção **Edge Fu
 
 ---
 
-## Passo 6: Crie um Usuário e uma API Key
+## Passo 6: Geração e Acesso da API Key
 
-A API é acessada por meio de chaves de API únicas por usuário. Este processo ainda é manual:
+Com a nova automação, o processo de criação de perfis e chaves de API é automático.
 
-1.  **Crie um novo usuário:**
-    - No dashboard do Supabase, vá para **Authentication**.
-    - Clique em **Add user** e crie um novo usuário com um e-mail e senha.
-    - Após a criação, copie o **UID** do novo usuário.
+1.  **Criação do Usuário:**
+    - Quando um novo usuário se cadastra na sua aplicação (seja pelo Supabase Auth UI ou por um processo customizado), o gatilho que configuramos no banco de dados (`on_auth_user_created`) é acionado automaticamente.
+    - Este gatilho cria uma entrada correspondente na tabela `public.profiles` e gera uma `api_key` única e segura para aquele usuário.
 
-2.  **Gere uma API Key:**
-    - Execute o script local para gerar uma nova chave:
-      ```bash
-      deno run --allow-read supabase/functions/_shared/generate_api_key.ts
-      ```
-    - Copie a chave gerada (ex: `gp_...`).
+2.  **Como Acessar a API Key de um Usuário (Como Administrador):**
+    - Por enquanto, o acesso à chave é um processo manual para o administrador do sistema.
+    - Vá para o **Table Editor** no seu dashboard Supabase.
+    - Selecione a tabela `profiles`.
+    - Encontre o usuário desejado e copie o valor da sua coluna `api_key`.
 
-3.  **Associe a API Key ao usuário no banco de dados:**
-    - Vá para o **SQL Editor** no dashboard do Supabase.
-    - Execute o seguinte comando SQL, substituindo `<user_id>` e `<api_key>` pelos valores que você copiou:
-      ```sql
-      INSERT INTO public.profiles (id, api_key, subscription_tier)
-      VALUES ('<user_id>', '<api_key>', 'free');
-      ```
+O próximo passo no desenvolvimento do produto (ÉPICO 02) é construir um "Portal do Desenvolvedor", onde os usuários poderão fazer login e visualizar suas próprias chaves de API diretamente.
 
 ---
 
