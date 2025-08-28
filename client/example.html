@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoPilot API SDK Example</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    button { font-size: 1.1em; padding: 0.5em 1em; }
+    pre { background-color: #f4f4f4; padding: 1em; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; }
+  </style>
+</head>
+<body>
+
+  <h1>GeoPilot API SDK Usage Example</h1>
+  <p>
+    Open the browser's developer console to see detailed logs.
+    <br>
+    Click the button below to send a `createMission` request to the API.
+  </p>
+
+  <button id="run-example-btn">Run `createMission` Example</button>
+
+  <h2>API Response:</h2>
+  <pre id="response-output">Click the button to see the response.</pre>
+
+  <script type="module">
+    // Import the SDK class and necessary types
+    import { GeoPilotAPI } from './geopilot-sdk.ts';
+
+    // --- Configuration ---
+    // IMPORTANT: Replace with your actual credentials
+    const YOUR_API_KEY = 'gp_...'; // <-- REPLACE THIS
+    const YOUR_PROJECT_REF = 'your-project-ref'; // <-- REPLACE THIS
+
+    const outputElement = document.getElementById('response-output');
+    const runButton = document.getElementById('run-example-btn');
+
+    function logToScreen(message) {
+      console.log(message);
+      outputElement.textContent = JSON.stringify(message, null, 2);
+    }
+
+    // --- Main Example Logic ---
+    async function runExample() {
+      logToScreen('Initializing GeoPilot API client...');
+
+      if (!YOUR_API_KEY.startsWith('gp_') || YOUR_PROJECT_REF === 'your-project-ref') {
+        logToScreen('ERROR: Please replace YOUR_API_KEY and YOUR_PROJECT_REF in example.html before running.');
+        return;
+      }
+
+      try {
+        // 1. Instantiate the SDK
+        const geoPilot = new GeoPilotAPI(YOUR_API_KEY, YOUR_PROJECT_REF);
+        logToScreen('Client initialized. Creating a new mission...');
+
+        // 2. Define the mission payload
+        const missionPayload = {
+          params: {
+            altitude: 120,
+            forwardOverlap: 0.75,
+            sideOverlap: 0.65,
+            sensorWidth: 23.5,
+            sensorHeight: 15.6,
+            focalLength: 35,
+            imageWidth: 6000,
+            imageHeight: 4000,
+            angle: 30,
+          },
+          polygon: [
+            { latitude: -23.5505, longitude: -46.6333 },
+            { latitude: -23.5515, longitude: -46.6323 },
+            { latitude: -23.5525, longitude: -46.6333 },
+            { latitude: -23.5515, longitude: -46.6343 },
+          ],
+        };
+
+        // 3. Call the createMission method
+        const newMission = await geoPilot.createMission(missionPayload);
+        logToScreen(newMission);
+
+      } catch (error) {
+        logToScreen({
+          error: true,
+          name: error.name,
+          message: error.message,
+          status: error.status,
+          response: error.response,
+        });
+      }
+    }
+
+    runButton.addEventListener('click', runExample);
+  </script>
+
+</body>
+</html>
